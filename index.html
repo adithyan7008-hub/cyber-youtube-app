@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adithyan Studio Cyber</title>
+<link rel="manifest" href="manifest.json">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color: white;
+}
+
+header {
+  text-align: center;
+  padding: 20px;
+  font-size: 24px;
+  backdrop-filter: blur(10px);
+  background: rgba(255,255,255,0.1);
+}
+
+input {
+  padding: 10px;
+  width: 300px;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+}
+
+button {
+  padding: 10px 15px;
+  border-radius: 20px;
+  border: none;
+  background: #00c6ff;
+  cursor: pointer;
+}
+
+#videos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(300px,1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.video-card {
+  background: rgba(255,255,255,0.1);
+  border-radius: 15px;
+  backdrop-filter: blur(8px);
+  padding: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">⚡ Adithyan Cyber</div>
+
+<div class="search-box">
+<input type="text" id="searchInput" placeholder="Search...">
+<button onclick="searchVideos()">Go</button>
+</div>
+
+<div class="toggle" onclick="toggleMode()">🌙</div>
+</header>
+
+<div class="container" id="videoContainer"></div>
+
+<div class="modal" id="videoModal" onclick="closeModal()">
+<iframe id="modalFrame" frameborder="0" allowfullscreen></iframe>
+</div>
+
+<script>
+const API_KEY = "AIzaSyAq2ZdiBuq_oA262xHNjvvZDqH470lMynw";
+
+function toggleMode(){
+document.body.classList.toggle("light");
+}
+
+function searchVideos(){
+const query = document.getElementById("searchInput").value;
+
+fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=12&q=${query}&key=${API_KEY}`)
+.then(res=>res.json())
+.then(data=>{
+const container=document.getElementById("videoContainer");
+container.innerHTML="";
+
+data.items.forEach(item=>{
+const videoId=item.id.videoId;
+const title=item.snippet.title;
+const thumb=item.snippet.thumbnails.high.url;
+
+const card=document.createElement("div");
+card.className="video-card";
+card.innerHTML=`
+<img src="${thumb}">
+<h4>${title}</h4>
+`;
+card.onclick=()=>openModal(videoId);
+container.appendChild(card);
+});
+});
+}
+
+function openModal(videoId){
+document.getElementById("videoModal").style.display="flex";
+document.getElementById("modalFrame").src=`https://www.youtube.com/embed/${videoId}`;
+}
+
+function closeModal(){
+document.getElementById("videoModal").style.display="none";
+document.getElementById("modalFrame").src="";
+}
+
+if('serviceWorker' in navigator){
+navigator.serviceWorker.register('service-worker.js');
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js')
+}
+</script>
+
+</body>
+<link rel="manifest" href="manifest.json">
+</html>
